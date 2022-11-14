@@ -349,14 +349,18 @@ class MDP:
 		# for every node's adjacency, pick the one that has the highest value
 		# use that as the new policy assignment
 		
-		for state in self.neighbors_directed.keys():
+		# for state in self.neighbors_directed.keys():
+		# for state in self.policy.keys():
+		for state, former_policy in self.policy.items():
 
-			print("reassigning policy for state: %s" % state)
+			print("reassigning policy for state: %s. previously -> %s" % (state, former_policy))
 
 			# get the arg max
 			to_state = self._argmax(state)
 
-			policy[state] = to_state
+			self.policy[state] = to_state
+
+			print("new policy ---> %s" % to_state)
 
 
 
@@ -445,32 +449,32 @@ temps = [
 A_Temp, B_Temp, C_Temp, D_Temp, E_Temp, F_Temp, G_Temp, H_Temp, I_Temp, J_Temp, K_Temp, L_Temp, M_Temp, N_Temp, P_Temp, Q_Temp
 ]
 
-policy = {}
+# policy = {}
 
 
-Edges = ['A','B','C','D','E','H','I','L','M','N','P','Q']
-# terminals, meaning, they don't fail or go back to themseleves
-# would be excluded from self loops
-Terminals = ['A', 'Q']
+# Edges = ['A','B','C','D','E','H','I','L','M','N','P','Q']
+# # terminals, meaning, they don't fail or go back to themseleves
+# # would be excluded from self loops
+# Terminals = ['A', 'Q']
 
-Neighbors_Directed = {
-	'A' : [],
-	'B' : ['A', 'C', 'F'],
-	'C' : ['B', 'G', 'D'],
-	'D' : ['C', 'H'],
-	'E' : ['A', 'F', 'I'],
-	'F' : ['E', 'B', 'G', 'J'],
-	'G' : ['F', 'C', 'H', 'K'],
-	'H' : ['D', 'G', 'L'],
-	'I' : ['E', 'J', 'M'],
-	'J' : ['I', 'F', 'K', 'N'],
-	'K' : ['J', 'G', 'L', 'P'],
-	'L' : ['K', 'H', 'Q'],
-	'M' : ['I', 'N'],
-	'N' : ['M', 'J', 'P'],
-	'P' : ['N', 'K', 'Q'],
-	'Q' : []
-}
+# Neighbors_Directed = {
+# 	'A' : [],
+# 	'B' : ['A', 'C', 'F'],
+# 	'C' : ['B', 'G', 'D'],
+# 	'D' : ['C', 'H'],
+# 	'E' : ['A', 'F', 'I'],
+# 	'F' : ['E', 'B', 'G', 'J'],
+# 	'G' : ['F', 'C', 'H', 'K'],
+# 	'H' : ['D', 'G', 'L'],
+# 	'I' : ['E', 'J', 'M'],
+# 	'J' : ['I', 'F', 'K', 'N'],
+# 	'K' : ['J', 'G', 'L', 'P'],
+# 	'L' : ['K', 'H', 'Q'],
+# 	'M' : ['I', 'N'],
+# 	'N' : ['M', 'J', 'P'],
+# 	'P' : ['N', 'K', 'Q'],
+# 	'Q' : []
+# }
 
 # Neighbors_Undirected = {
 # 	'A' : ['B', 'E'],
