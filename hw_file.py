@@ -40,59 +40,10 @@ T_Temp = 0
 
 tolerance = 0.001
 # probability of failure
-alpha = 0.15
-p_success = 1 - alpha
+# alpha = 0.15
+# p_success = 1 - alpha
 
 
-# TERMINAL NODES R(s) given
-VA = 11
-VQ = -11
-
-
-# CHANCE NODES, R(s) = +4
-# i, f, k, n
-VJ = 4 + .25*I + .25*F + .25*K + .25*N
-# f, c, h, k
-VG = 4 + .25*F + .25*C + .25*H + .25*K
-
-
-
-# DECISION NODES, R(s) = -1
-# a, f, c, b
-VB = -1 + .25*A + .25*F + .25*C + .25*B
-
-# b, g, d, c
-VC = -1 + .25*B + .25*G + .25*D + .25*C
-
-# c, d, h
-VD = -1 + .33333*C + .33333*D + .33333*H
-
-# a, f, i, e
-VE = -1 + .25*A + .25*F + .25*I + .25*E
-
-# e, b, g, j
-VF = -1 + .25*E + .25*B + .25*G + .25*J
-
-# d, l, g, h
-VH = -1 + .25*D + .25*L + .25*G + .25*H
-
-# e, j, m, i
-VI = -1 + .25*E + .25*J + .25*M + .25*I
-
-# j, g, l, p
-VK = -1 + .25*J + .25*G + .25*L + .25*P
-
-# k, h, q, l
-VL = -1 + .25*K + .25*H + .25*Q + .25*L
-
-# i, n, m
-VM = -1 + .33333*I + .33333*N + .33333*M
-
-# m, j, p, n
-VN = -1 + .25*M + .25*J + .25*P + .25*N 
-
-# n, k, q, p
-VP = -1 + .25*N + .25*K + .25*Q + .25*P
 
 
 
@@ -374,29 +325,6 @@ class MDP:
 
 
 
-
-	# for letter in Neighbors_Directed.keys():
-
-	# 	# if policy[letter] is None: # or if letter in terminals
-	# 	if letter in terminal_nodes:
-	# 		Value = Rewards[letter]
-
-	# 	elif letter in chance_nodes:
-	# 		# split evenly among directed children
-	# 		equal_chance_nodes = Neighbors_Directed[letter]
-	# 		Value = Rewards[letter]
-
-	# 		split = len(equal_chance_nodes)
-	# 		for adjacent_possibility in equal_chance_nodes:
-	# 			Value += ( gamma * (1/split) * adjacent_possibility)
-
-
-
-
-# supposed to converge to: T=10, A=7, B=6, C=5
-
-# converge = False
-
 '''
 # i liked this pseudocode here:
 https://medium.com/@ngao7/markov-decision-process-value-iteration-2d161d50a6ff
@@ -449,51 +377,7 @@ temps = [
 A_Temp, B_Temp, C_Temp, D_Temp, E_Temp, F_Temp, G_Temp, H_Temp, I_Temp, J_Temp, K_Temp, L_Temp, M_Temp, N_Temp, P_Temp, Q_Temp
 ]
 
-# policy = {}
 
-
-# Edges = ['A','B','C','D','E','H','I','L','M','N','P','Q']
-# # terminals, meaning, they don't fail or go back to themseleves
-# # would be excluded from self loops
-# Terminals = ['A', 'Q']
-
-# Neighbors_Directed = {
-# 	'A' : [],
-# 	'B' : ['A', 'C', 'F'],
-# 	'C' : ['B', 'G', 'D'],
-# 	'D' : ['C', 'H'],
-# 	'E' : ['A', 'F', 'I'],
-# 	'F' : ['E', 'B', 'G', 'J'],
-# 	'G' : ['F', 'C', 'H', 'K'],
-# 	'H' : ['D', 'G', 'L'],
-# 	'I' : ['E', 'J', 'M'],
-# 	'J' : ['I', 'F', 'K', 'N'],
-# 	'K' : ['J', 'G', 'L', 'P'],
-# 	'L' : ['K', 'H', 'Q'],
-# 	'M' : ['I', 'N'],
-# 	'N' : ['M', 'J', 'P'],
-# 	'P' : ['N', 'K', 'Q'],
-# 	'Q' : []
-# }
-
-# Neighbors_Undirected = {
-# 	'A' : ['B', 'E'],
-# 	'B' : ['A', 'C', 'F'],
-# 	'C' : ['B', 'G', 'D'],
-# 	'D' : ['C', 'H'],
-# 	'E' : ['A', 'F', 'I'],
-# 	'F' : ['E', 'B', 'G', 'J'],
-# 	'G' : ['F', 'C', 'H', 'K'],
-# 	'H' : ['D', 'G', 'L'],
-# 	'I' : ['E', 'J', 'M'],
-# 	'J' : ['I', 'F', 'K', 'N'],
-# 	'K' : ['J', 'G', 'L', 'P'],
-# 	'L' : ['K', 'H', 'Q'],
-# 	'M' : ['I', 'N'],
-# 	'N' : ['M', 'J', 'P'],
-# 	'P' : ['N', 'K', 'Q'],
-# 	'Q' : ['P', 'L']
-# }
 
 Rewards = {
 	'A' : 11,
@@ -514,35 +398,7 @@ Rewards = {
 	'Q' : -11 
 }
 
-# chance_nodes = ['J','G']
-# decision_nodes = ['B','C','D','E','F','H','I','K','L','M','N','P']
-# terminal_nodes = ['A','Q']
 
-
-# for letter in edges, if letter not in terminals, then also include self loop.
-# if letter not in edges, then there is no self loop possible.
-
-
-# def make_random_policy():
-
-# 	for letter in alphabet:
-
-# 		print(letter)
-# 		letters_neighbors = Neighbors_Directed[letter]
-
-# 		# if not letters_neighbors:
-# 		if letter in terminal_nodes:
-# 			# we know it's a terminal node, so leave it empty
-# 			policy[letter] = None
-
-# 		elif letter in chance_nodes:
-# 			policy[letter] = None
-
-# 		else:
-# 			#otherwise pick a random neighbor to assign
-# 			choice = random.choice(letters_neighbors)
-# 			print("initially setting policy for %s -> %s" % (letter, choice))
-# 			policy[letter] = choice
 
 
 def value_iteration_to_convergence(A,B,C,D,E,F,G,H,I,J,K,L,M,N,P,Q):
@@ -638,40 +494,12 @@ if __name__ == '__main__':
 	M.make_random_policy()
 	M.set_initial_values()
 
-	# for k,v in policy.items():
-	# 	print("%s -> %s" % (k,v))
-
-	# set the initial values of all states, make them be zero initially
-	# set_initial_values()
-
-	# for letter in policy.keys():
-
-	# 	if policy[letter] is None:
-	# 		pass
-	# 		# we know it's terminal, just include the reward
-
 
 	# make the equations
 	M.set_up_probabilities()
 
 	M.calculate_once()
 	M.recalculate_policy()
-	# for letter in Neighbors_Directed.keys():
-
-	# 	# if policy[letter] is None: # or if letter in terminals
-	# 	if letter in terminal_nodes:
-	# 		Value = Rewards[letter]
-
-	# 	elif letter in chance_nodes:
-	# 		# split evenly among directed children
-	# 		equal_chance_nodes = Neighbors_Directed[letter]
-	# 		Value = Rewards[letter]
-
-	# 		split = len(equal_chance_nodes)
-	# 		for adjacent_possibility in equal_chance_nodes:
-	# 			Value += ( gamma * (1/split) * adjacent_possibility)
-
-
 
 
 
