@@ -2,7 +2,7 @@
 import math
 import random
 
-gamma = 0.85
+gamma = 0.9
 tolerance = 0.001
 # probability of failure
 # alpha = 0.15
@@ -291,6 +291,7 @@ class MDP:
 
 					# debugging
 					print("+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], adjacent_state_name), end="")
+					# print("\t+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], transitional_value), end="")
 
 					# print("\ty:%s, to_state:%s, transitional_value:%s, likelihood:%s == additive_value:%s" % (y, transition_states[y], transitional_value, transition_likelihoods[y], additive_value))
 					# print("\tnew value: %s" % pi_value)
