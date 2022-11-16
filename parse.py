@@ -186,7 +186,7 @@ class Parser:
 				sys.exit(1)
 
 
-	def parse_main(self):
+	def parse(self):
 
 		# go through the file initially and collect properties
 		self.raw_parse()
@@ -224,6 +224,18 @@ class Parser:
 		pprint(self.rewards)
 
 
+		props = {
+				'all_states' : self.nodes_list,
+				'neighbors_directed' : self.node_adjacency_mappings,
+				'rewards' : self.rewards,
+				'probabilities' : self.probabilities,
+				'chance_nodes' : self.chance_nodes,
+				'decision_nodes' : self.decision_nodes,
+				'terminal_nodes' : self.terminal_nodes
+		}
+
+
+		return props
 
 
 

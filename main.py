@@ -7,6 +7,9 @@ import argparse
 import parse
 from parse import Parser
 
+import methodpicker
+from methodpicker import Methodpicker
+
 from pprint import pprint
 
 
@@ -26,7 +29,7 @@ def main(discount_factor, tolerance, infile, max_iterations, minimize_values, li
 
 
 	p = Parser(lines)
-	props = p.parse_main()
+	props = p.parse()
 
 
 	method = determine_solver_method(lines)
