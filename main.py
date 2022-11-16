@@ -20,7 +20,7 @@
 if __name__ == '__main__':
 	# USAGE: ./main.py -v 2 data/input/tiny.txt
 	# mdp -df .9 -tol 0.0001 some-input.txt
-	
+
 
 	#
 	# PARSE COMMAND LINE 
@@ -47,3 +47,4 @@ if __name__ == '__main__':
 
 
 	map_coloring_via_dpll(infile, lines)
+
