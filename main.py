@@ -10,23 +10,16 @@ from parse import Parser
 import methodpicker
 from methodpicker import Methodpicker
 
-from pprint import pprint
+import mdpsolver
+from mdpsolver import MDP
 
 
 
-
-def determine_solver_method(lines):
-
-	pass
-
-
-
-def main(discount_factor, tolerance, infile, max_iterations, minimize_values, lines):
+def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 	# parse the file into necessary pieces
 	# detect cycles (if any)
 	# determine solver method (mdp vs etc....)
-
 
 	p = Parser(lines)
 	props = p.parse()
@@ -36,10 +29,42 @@ def main(discount_factor, tolerance, infile, max_iterations, minimize_values, li
 
 	print("method we will use: %s" % method)
 
+	## next steps
+	# implement MDP solver
+	# ALSO implement backwards induction solver
 
 
+	if method == "MDP":
+		# use MDP solver
+		# this method does not use min/max flag
+
+		M = MDP(discount_factor, tolerance, max_iterations, props)
+
+		# set initial policy is random
+		M.make_random_policy()
+		M.set_initial_values()
 
 
+		# # set initial policy is random
+		# M.make_random_policy()
+		# M.set_initial_values()
+
+		# # make the equations
+		# M.set_up_probabilities()
+
+		# M.policy_iteration()
+
+		# for k,v in policy_hist.items():
+		# 	print("%s : %s" % (k,v))
+
+
+		# for state, final_val in M.state_values.items():
+		# 	print("%s -> %s" % (state, final_val))
+
+
+	elif method == "BACKWARDS_INDUCTION":
+		# this method uses min/max flag
+		 pass
 
 
 
@@ -95,6 +120,6 @@ if __name__ == '__main__':
 
 	print("discount_factor:%s, tolerance:%s" % (discount_factor, tolerance))
 
-	main(discount_factor, tolerance, infile, max_iterations, minimize_values, lines)
+	main(discount_factor, tolerance, max_iterations, minimize_values, lines)
 
 

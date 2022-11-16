@@ -186,28 +186,28 @@ class Parser:
 		# final checks on correctness of data
 		self.clean_enriched_data()
 
-		# print("FINAL props:")
+		print("FINAL props:")
 
-		# print("chance nodes:")
-		# print(self.chance_nodes)
+		print("chance nodes:")
+		print(self.chance_nodes)
 
-		# print("decision nodes:")
-		# print(self.decision_nodes)
+		print("decision nodes:")
+		print(self.decision_nodes)
 
-		# print("terminal nodes:")
-		# print(self.terminal_nodes)
+		print("terminal nodes:")
+		print(self.terminal_nodes)
 
-		# print("names of all nodes in the graph:")
-		# print(self.nodes_list)
+		print("names of all nodes in the graph:")
+		print(self.nodes_list)
 
-		# print("node-adjacency-mappings:")
-		# pprint(self.node_adjacency_mappings)
+		print("node-adjacency-mappings:")
+		pprint(self.node_adjacency_mappings)
 
-		# print("probabilities:")
-		# pprint(self.probabilities)
+		print("probabilities:")
+		pprint(self.probabilities)
 
-		# print("rewards:")
-		# pprint(self.rewards)
+		print("rewards:")
+		pprint(self.rewards)
 
 
 		props = {
