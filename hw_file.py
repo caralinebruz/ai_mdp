@@ -8,28 +8,6 @@ tolerance = 0.001
 # alpha = 0.15
 # p_success = 1 - alpha
 
-alphabet = [
-'A','B','C','D','E','F','G','H','I','J','K','L','M','N','P','Q'
-]
-
-Rewards = {
-	'A' : 11,
-	'B' : -1,
-	'C' : -1,
-	'D' : -1,
-	'E' : -1, 
-	'F' : -1, 
-	'G' : 4, 
-	'H' : -1, 
-	'I' : -1, 
-	'J' : 4, 
-	'K' : -1, 
-	'L' : -1, 
-	'M' : -1, 
-	'N' : -1, 
-	'P' : -1, 
-	'Q' : -11 
-}
 
 policy_hist = {}
 
@@ -46,6 +24,25 @@ class MDP:
 		self.all_states = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','P','Q']
 		self.alpha = 0.15
 		self.p_success = 0.85
+
+		self.rewards = {
+			'A' : 11,
+			'B' : -1,
+			'C' : -1,
+			'D' : -1,
+			'E' : -1, 
+			'F' : -1, 
+			'G' : 4, 
+			'H' : -1, 
+			'I' : -1, 
+			'J' : 4, 
+			'K' : -1, 
+			'L' : -1, 
+			'M' : -1, 
+			'N' : -1, 
+			'P' : -1, 
+			'Q' : -11 
+		}
 
 
 		self.neighbors_directed = {
@@ -73,7 +70,7 @@ class MDP:
 
 
 	def make_random_policy(self):
-		for letter in alphabet:
+		for letter in self.all_states:
 
 			print(letter)
 			letters_neighbors = self.neighbors_directed[letter]
@@ -194,7 +191,7 @@ class MDP:
 
 			print("working on state %s" % state)
 			# for all of them, they are just assigned their iterative value
-			pi_value = Rewards[state]
+			pi_value = self.rewards[state]
 
 			print("\n")
 
