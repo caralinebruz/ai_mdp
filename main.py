@@ -47,22 +47,14 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 		# make the equations
 		M.set_up_probabilities()
 
+		M.policy_iteration()
 
-		# # set initial policy is random
-		# M.make_random_policy()
-		# M.set_initial_values()
-
-		# # make the equations
-		# M.set_up_probabilities()
-
-		# M.policy_iteration()
-
-		# for k,v in policy_hist.items():
-		# 	print("%s : %s" % (k,v))
+		for k,v in M.policy_hist.items():
+			print("%s : %s" % (k,v))
 
 
-		# for state, final_val in M.state_values.items():
-		# 	print("%s -> %s" % (state, final_val))
+		for state, final_val in M.state_values.items():
+			print("%s -> %s" % (state, final_val))
 
 
 	elif method == "BACKWARDS_INDUCTION":
@@ -83,7 +75,7 @@ if __name__ == '__main__':
 	# PARSE COMMAND LINE 
 	#
 	infile = "" # file
-	discount_factor = 1	#default
+	discount_factor = 1.0	#default
 	tolerance = 0.01
 	max_iterations = 100
 	minimize_values = False
@@ -102,11 +94,11 @@ if __name__ == '__main__':
 	if not args.df:
 		print("You didn't input a discount factor. Using default of 1")
 	else:
-		discount_factor = args.df
+		discount_factor = float(args.df)
 	if not args.tol:
 		print("You didn't input a tolerance. Using default of 0.01")
 	else:
-		tolerance = args.tol
+		tolerance = float(args.tol)
 	if not args.iter:
 		print("You didn't input a max iteration. Using default of 100")
 	else:

@@ -3,7 +3,7 @@ import math
 import random
 
 
-policy_hist = {}
+
 
 
 class MDP:
@@ -24,16 +24,11 @@ class MDP:
 		self.all_states = props['all_states']
 		self.tolerance = tolerance
 		self.gamma = gamma
-
-		# there is no alpha in this LAB
-		# self.alpha = 0.15
-		# self.p_success = (1 - self.alpha)
+		self.max_iterations = max_iterations
 
 		self.neighbors_directed = props['neighbors_directed']
+		self.policy_hist = {}
 
-		# def extend_neighbors(self):
-		# 	for state in self.terminal_nodes:
-		# 		self.neighbors_directed[state] = None
 
 
 	def make_random_policy(self):
@@ -47,7 +42,7 @@ class MDP:
 				self.policy[letter] = None
 
 				# also add it to the neighbors for later *****
-				self.neighbors_directed[letter] = None
+				self.neighbors_directed[letter] = []
 
 			elif letter in self.chance_nodes:
 				self.policy[letter] = None
@@ -61,7 +56,7 @@ class MDP:
 
 		# for my logging and debugging, add it to the policy hist
 		for s,val in self.policy.items():
-			policy_hist[s] = [val]
+			self.policy_hist[s] = [val]
 
 
 	def set_initial_values(self):
@@ -81,11 +76,6 @@ class MDP:
 			if letter in self.chance_nodes:
 				# split evenly among directed children
 				equal_chance_nodes = self.neighbors_directed[letter].copy()
-
-				# # for the hw only
-				# if self.self_loops:
-				# 	if letter in self.against_wall:
-				# 		equal_chance_nodes.append(letter)
 
 				split = len(equal_chance_nodes)
 
@@ -119,7 +109,7 @@ class MDP:
 					for z in range(1,num_adjacent):
 						
 						self.probabilities[letter][z] = split
-						print("z:%s assign p_fail:%s " % (z, split))
+						# print("z:%s assign p_fail:%s " % (z, split))
 
 
 			print(self.probabilities[letter])
@@ -132,17 +122,17 @@ class MDP:
 		next_policy = None
 
 		for adjacent_state in self.neighbors_directed[state]:
-			# print("adj -> %s" % adjacent_state)
+			print("adj -> %s" % adjacent_state)
 
 			if self.state_values[adjacent_state] > largest:
 
-				# print("%s > %s" % (self.state_values[adjacent_state], largest))
+				print("%s > %s" % (self.state_values[adjacent_state], largest))
 
 				largest = self.state_values[adjacent_state]
 				next_policy = adjacent_state
 			else:
-				pass
-				# print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
+				# pass
+				print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
 
 		return next_policy
 
@@ -200,13 +190,13 @@ class MDP:
 					transitional_value = pi_current_values[adjacent_state_name]
 
 
-					additive_value = gamma * transition_likelihoods[y] * transitional_value
+					additive_value = self.gamma * transition_likelihoods[y] * transitional_value
 
 					pi_value+= additive_value
 					pi_state_values[state] = pi_value
 
 					# debugging
-					print("+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], adjacent_state_name), end="")
+					print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
 
 					# print("\ty:%s, to_state:%s, transitional_value:%s, likelihood:%s == additive_value:%s" % (y, transition_states[y], transitional_value, transition_likelihoods[y], additive_value))
 					# print("\tnew value: %s" % pi_value)
@@ -221,11 +211,6 @@ class MDP:
 
 				restof_nodes = self.neighbors_directed[state].copy()
 				restof_nodes.remove(to_node)
-
-				# for the hw only
-				if self.self_loops:
-					if state in self.against_wall:
-						restof_nodes.append(state)
 
 				transition_states = []
 				transition_states.append(to_node)
@@ -249,13 +234,13 @@ class MDP:
 					adjacent_state_name = transition_states[y]
 					transitional_value = pi_current_values[adjacent_state_name]
 
-					additive_value = gamma * transition_likelihoods[y] * transitional_value
+					additive_value = self.gamma * transition_likelihoods[y] * transitional_value
 
 					pi_value+= additive_value
 					pi_state_values[state] = pi_value
 
 					# debugging
-					print("+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], adjacent_state_name), end="")
+					print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
 					# print("\t+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], transitional_value), end="")
 
 					# print("\ty:%s, to_state:%s, transitional_value:%s, likelihood:%s == additive_value:%s" % (y, transition_states[y], transitional_value, transition_likelihoods[y], additive_value))
@@ -296,7 +281,7 @@ class MDP:
 			x+= 1
 			print("\nIteration %s:" % x)
 
-			if x == 100:
+			if x == self.max_iterations:
 				break
 
 			delta = 0
@@ -325,7 +310,7 @@ class MDP:
 
 			print("delta :%s \n" % delta)
 
-			if delta < tolerance:
+			if delta < self.tolerance:
 				print("I converge after %s iterations\n" % x)
 				converge = True
 
@@ -382,7 +367,7 @@ class MDP:
 		print("new policy:")
 		for k,v in self.policy.items():
 			print("%s --> %s" % (k,v))
-			policy_hist[k].append(v)
+			self.policy_hist[k].append(v)
 
 
 		return counter
@@ -405,7 +390,7 @@ class MDP:
 				break
 
 			self.value_iteration()
-			policy_changes = M.recalculate_policy()
+			policy_changes = self.recalculate_policy()
 
 
 			if policy_changes == 0:
@@ -434,30 +419,30 @@ while not converge
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-	M = MDP()
+# 	M = MDP()
 
-	# set initial policy is random
-	M.make_random_policy()
-	M.set_initial_values()
-
-
-	# make the equations
-	M.set_up_probabilities()
-
-	M.policy_iteration()
+# 	# set initial policy is random
+# 	M.make_random_policy()
+# 	M.set_initial_values()
 
 
+# 	# make the equations
+# 	M.set_up_probabilities()
+
+# 	M.policy_iteration()
 
 
 
-	for k,v in policy_hist.items():
-		print("%s : %s" % (k,v))
 
 
-	for state, final_val in M.state_values.items():
-		print("%s -> %s" % (state, final_val))
+# 	for k,v in policy_hist.items():
+# 		print("%s : %s" % (k,v))
+
+
+# 	for state, final_val in M.state_values.items():
+# 		print("%s -> %s" % (state, final_val))
 
 
 
