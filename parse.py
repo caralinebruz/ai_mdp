@@ -56,8 +56,8 @@ class Parser:
 
 				# add the probabilities
 				probs = data[1].lstrip()
-				probs = probs.replace(' ','')
-				probs = probs.strip('[] ').split(',')
+				probs = probs.split(' ')
+				probs = list(map(float, probs))
 
 				# true if all the strings are non-empty
 				if all(probs):
@@ -73,7 +73,7 @@ class Parser:
 					self.nodes_list.append(node_name)
 
 				# add reward to dict
-				self.rewards[node_name] = data[1]
+				self.rewards[node_name] = int(data[1].strip(' '))
 
 		print("names of all nodes in the graph:")
 		print(self.nodes_list)
@@ -85,7 +85,7 @@ class Parser:
 		pprint(self.rewards)
 
 
-	def clean_data(self):
+	def clean_raw_data(self):
 		'''Go through data check valid things
 
 		1. If a node has edges but no probability entry
@@ -153,8 +153,12 @@ class Parser:
 
 			# chance node
 			elif len(probs) > 1:
-				if state not in self.chance_nodes:
-					self.chance_nodes.append(state)
+				if len(probs) == len(self.node_adjacency_mappings[state]):
+					if state not in self.chance_nodes:
+						self.chance_nodes.append(state)
+				else:
+					print("node doesnt qualify as decision node, but P doesnt match num edges")
+					sys.exit(1)
 
 
 		print("chance nodes")
@@ -168,16 +172,38 @@ class Parser:
 
 
 
+	def clean_enriched_data(self):
+		'''
+			6. probability checks
+				6a. must sum to 1
+		'''
+		# case 6
+		for state, probs in self.probabilities.items():
+
+			# ensure chance node P sum to 1
+			if state in self.chance_nodes:
+
+				print("STATE:%s" % state)
+				p_sum = 0
+				for p in probs:
+					p_sum+= p
+				if p_sum != 1:
+					print("case 6: die because probabilities for state %s not sum to 1" % state)
+					sys.exit(1)
+
+
 	def parse_main(self):
 
 		# go through the file initially and collect properties
 		self.raw_parse()
 
 		# error checking on inputs
-		self.clean_data()
+		self.clean_raw_data()
 
 		# go through collected properties and enrich the information
 		self.enrich_data()
+
+		self.clean_enriched_data()
 
 
 		# check if the data is cyclic or acyclic
