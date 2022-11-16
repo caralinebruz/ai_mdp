@@ -44,6 +44,9 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 		M.make_random_policy()
 		M.set_initial_values()
 
+		# make the equations
+		M.set_up_probabilities()
+
 
 		# # set initial policy is random
 		# M.make_random_policy()

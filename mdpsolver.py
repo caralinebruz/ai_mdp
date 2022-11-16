@@ -12,7 +12,9 @@ class MDP:
 		self.policy = {}
 		self.state_values = {}
 
-		self.probabilities = props['probabilities']
+		self.given_probabilities = props['probabilities']
+		self.probabilities = {}
+
 		self.rewards = props['rewards']
 
 		self.chance_nodes = props['chance_nodes']
@@ -29,6 +31,10 @@ class MDP:
 
 		self.neighbors_directed = props['neighbors_directed']
 
+		# def extend_neighbors(self):
+		# 	for state in self.terminal_nodes:
+		# 		self.neighbors_directed[state] = None
+
 
 	def make_random_policy(self):
 		for letter in self.all_states:
@@ -39,6 +45,9 @@ class MDP:
 			if letter in self.terminal_nodes:
 				# we know it's a terminal node, so leave it empty
 				self.policy[letter] = None
+
+				# also add it to the neighbors for later *****
+				self.neighbors_directed[letter] = None
 
 			elif letter in self.chance_nodes:
 				self.policy[letter] = None
@@ -73,10 +82,10 @@ class MDP:
 				# split evenly among directed children
 				equal_chance_nodes = self.neighbors_directed[letter].copy()
 
-				# for the hw only
-				if self.self_loops:
-					if letter in self.against_wall:
-						equal_chance_nodes.append(letter)
+				# # for the hw only
+				# if self.self_loops:
+				# 	if letter in self.against_wall:
+				# 		equal_chance_nodes.append(letter)
 
 				split = len(equal_chance_nodes)
 
@@ -88,12 +97,6 @@ class MDP:
 			if letter in self.decision_nodes:
 
 				adjacent_nodes = self.neighbors_directed[letter].copy()
-
-				# for the hw only
-				if self.self_loops:
-					if letter in self.against_wall:
-						adjacent_nodes.append(letter)
-
 				num_adjacent = len(adjacent_nodes)
 
 				# look up what the policy should be
@@ -103,16 +106,20 @@ class MDP:
 				self.probabilities[letter] = [0] * num_adjacent
 
 				# fill in top choice gets highest prob
-				self.probabilities[letter][0] = self.p_success
+				p_success = self.given_probabilities[letter][0]
+				p_fail = 1 - p_success
+				self.probabilities[letter][0] = p_success
 
-				# rest of them get distributed evenly
-				split = self.alpha/(num_adjacent - 1)
+				# if p_success ==1 then there is nothing to distribute
+				if p_success < 1:
+					# rest of them get distributed evenly
+					split = p_fail/(num_adjacent - 1)
 
-				# assigns index 1... end with the equal split of p_fail
-				for z in range(1,num_adjacent):
-					
-					self.probabilities[letter][z] = split
-					# print("z:%s assign p_fail:%s " % (z, split))
+					# assigns index 1... end with the equal split of p_fail
+					for z in range(1,num_adjacent):
+						
+						self.probabilities[letter][z] = split
+						print("z:%s assign p_fail:%s " % (z, split))
 
 
 			print(self.probabilities[letter])
