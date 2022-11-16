@@ -24,6 +24,10 @@ class Parser:
 		'''
 		for line in self.lines:
 
+			# is a comment, skip immediately
+			if line.startswith("#"):
+				continue
+
 			# is a directed mapping parent > child
 			if ":" in line:
 				data = line.split(':')
@@ -115,22 +119,22 @@ class Parser:
 					# mark as terminal, after it passes error check
 					self.terminal_nodes.append(state)
 
-		# case 5
-		for parent_state, edges in self.node_adjacency_mappings.items():
-			# must have reward, probability, or edges
+		# # case 5
+		# for parent_state, edges in self.node_adjacency_mappings.items():
+		# 	# must have reward, probability, or edges
 
-			for child_state in edges:
-				valid = False
-				if child_state in self.probabilities.keys():
-					valid = True
-				if child_state in self.rewards.keys():
-					valid = True
-				if child_state in self.node_adjacency_mappings.keys():
-					valid = True
+		# 	for child_state in edges:
+		# 		valid = False
+		# 		if child_state in self.probabilities.keys():
+		# 			valid = True
+		# 		if child_state in self.rewards.keys():
+		# 			valid = True
+		# 		if child_state in self.node_adjacency_mappings.keys():
+		# 			valid = True
 
-			if not valid:
-				print("case 5: die because something that was listed as an edge doesnt meet one of three criteria")
-				sys.exit(1)
+		# 	if not valid:
+		# 		print("case 5: die because something that was listed as an edge doesnt meet one of three criteria")
+		# 		sys.exit(1)
 
 
 	def enrich_data(self):
@@ -173,6 +177,8 @@ class Parser:
 			# must have reward, probability, or edges
 
 			for child_state in edges:
+
+				print("child state: %s" % child_state)
 				valid = False
 				if child_state in self.probabilities.keys():
 					valid = True
@@ -200,28 +206,28 @@ class Parser:
 		# final checks on correctness of data
 		self.clean_enriched_data()
 
-		print("FINAL props:")
+		# print("FINAL props:")
 
-		print("chance nodes:")
-		print(self.chance_nodes)
+		# print("chance nodes:")
+		# print(self.chance_nodes)
 
-		print("decision nodes:")
-		print(self.decision_nodes)
+		# print("decision nodes:")
+		# print(self.decision_nodes)
 
-		print("terminal nodes:")
-		print(self.terminal_nodes)
+		# print("terminal nodes:")
+		# print(self.terminal_nodes)
 
-		print("names of all nodes in the graph:")
-		print(self.nodes_list)
+		# print("names of all nodes in the graph:")
+		# print(self.nodes_list)
 
-		print("node-adjacency-mappings:")
-		pprint(self.node_adjacency_mappings)
+		# print("node-adjacency-mappings:")
+		# pprint(self.node_adjacency_mappings)
 
-		print("probabilities:")
-		pprint(self.probabilities)
+		# print("probabilities:")
+		# pprint(self.probabilities)
 
-		print("rewards:")
-		pprint(self.rewards)
+		# print("rewards:")
+		# pprint(self.rewards)
 
 
 		props = {

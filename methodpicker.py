@@ -61,7 +61,7 @@ class Methodpicker:
 		for from_node, to_list in self.node_to_children_mappings.items():
 
 			index_num_row = index[from_node]
-			print("ROW -- %s: %s" % (from_node, index_num_row))
+			# print("ROW -- %s: %s" % (from_node, index_num_row))
 
 			if to_list is None:
 				continue
@@ -70,12 +70,12 @@ class Methodpicker:
 					index_num_col = index[to_node]
 					adj[index_num_row][index_num_col] +=1
 
-		print("index:")
-		pprint(index)
+		# print("index:")
+		# pprint(index)
 
-		print("adj:")
-		for r in adj:
-			print(r)
+		# print("adj:")
+		# for r in adj:
+		# 	print(r)
 
 		return adj, index, num, cols
 
@@ -120,7 +120,7 @@ class Methodpicker:
 					if v == x:
 						root = k
 
-		print("ROOT IS :%s" % root)
+		# print("ROOT IS :%s" % root)
 		return root
 
 	def _build_tree_inner(self, node, already_created_nodes_names):
@@ -128,21 +128,18 @@ class Methodpicker:
 			Returns:
 				The root node of the tree
 		'''
-		print("working on node : %s" % node.name)
-		pprint(self.node_to_children_mappings)
-
 		if not node.name in self.node_to_children_mappings.keys():
-			print("not in keys, must be a leaf??")
+			# print("not in keys, must be a leaf??")
 			node.value = self.rewards[node.name]
-			print("adding value to leaf: %s" % node.value)
+			# print("adding value to leaf: %s" % node.value)
 
 		else:
 			children = self.node_to_children_mappings[node.name]
 		
 			if children is None:
-				print("reached a leaf node")
+				# print("reached a leaf node")
 				node.value = self.rewards[node.name]
-				print("adding value to leaf: %s" % node.value)
+				# print("adding value to leaf: %s" % node.value)
 
 			else:
 				for child in children:
@@ -223,7 +220,7 @@ class Methodpicker:
 		item_to_be_root = self.pick_a_root()
 
 		if not item_to_be_root:
-			print("no root found, no nodes without incoming edges")
+			# print("no root found, no nodes without incoming edges")
 
 			# if root returned is none, that means there were no
 			# nodes without incoming edges
@@ -239,7 +236,7 @@ class Methodpicker:
 
 			if not self.check_for_cycles():
 
-				print("no cycles detected. I can do backwards induction.")
+				# print("no cycles detected. I can do backwards induction.")
 				self.method = "BACKWARDS_INDUCTION"
 				return self.method
 

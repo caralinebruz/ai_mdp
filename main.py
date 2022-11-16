@@ -34,8 +34,7 @@ def main(discount_factor, tolerance, infile, max_iterations, minimize_values, li
 	m = Methodpicker(props)
 	method = m.pick()
 
-
-	method = determine_solver_method(lines)
+	print("method we will use: %s" % method)
 
 
 
