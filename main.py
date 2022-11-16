@@ -31,6 +31,9 @@ def main(discount_factor, tolerance, infile, max_iterations, minimize_values, li
 	p = Parser(lines)
 	props = p.parse()
 
+	m = Methodpicker(props)
+	method = m.pick()
+
 
 	method = determine_solver_method(lines)
 
