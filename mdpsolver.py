@@ -122,17 +122,17 @@ class MDP:
 		next_policy = None
 
 		for adjacent_state in self.neighbors_directed[state]:
-			print("adj -> %s" % adjacent_state)
+			# print("adj -> %s" % adjacent_state)
 
 			if self.state_values[adjacent_state] > largest:
 
-				print("%s > %s" % (self.state_values[adjacent_state], largest))
+				# print("%s > %s" % (self.state_values[adjacent_state], largest))
 
 				largest = self.state_values[adjacent_state]
 				next_policy = adjacent_state
 			else:
-				# pass
-				print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
+				pass
+				# print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
 
 		return next_policy
 
