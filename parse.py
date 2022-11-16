@@ -75,15 +75,6 @@ class Parser:
 				# add reward to dict
 				self.rewards[node_name] = int(data[1].strip(' '))
 
-		print("names of all nodes in the graph:")
-		print(self.nodes_list)
-		print("node-adjacency-mappings:")
-		pprint(self.node_adjacency_mappings)
-		print("probabilities:")
-		pprint(self.probabilities)
-		print("rewards:")
-		pprint(self.rewards)
-
 
 	def clean_raw_data(self):
 		'''Go through data check valid things
@@ -105,7 +96,6 @@ class Parser:
 			if state not in self.rewards.keys():
 				self.rewards[state] = 0
 
-
 			# case 4
 			if len(edges) == 1:
 				# it will always transition to that edge with p=1
@@ -115,13 +105,15 @@ class Parser:
 		# case 3
 		for state in self.nodes_list:
 			if state not in self.node_adjacency_mappings.keys():
-				# it is terminal
-				self.terminal_nodes.append(state)
 				# consider error
 				if state in self.probabilities.keys():
-					print("case 3: error")
-					print("removing probability entry for terminal node")
+					print("case 3: error - removing probability entry for terminal node:%s" % state)
 					del self.probabilities[state]
+
+					# pprint(self.probabilities)
+				else:
+					# mark as terminal, after it passes error check
+					self.terminal_nodes.append(state)
 
 		# case 5
 		for parent_state, edges in self.node_adjacency_mappings.items():
@@ -139,7 +131,6 @@ class Parser:
 			if not valid:
 				print("case 5: die because something that was listed as an edge doesnt meet one of three criteria")
 				sys.exit(1)
-
 
 
 	def enrich_data(self):
@@ -161,35 +152,38 @@ class Parser:
 					sys.exit(1)
 
 
-		print("chance nodes")
-		print(self.chance_nodes)
-
-		print("decision nodes")
-		print(self.decision_nodes)
-
-		print("terminal nodes")
-		print(self.terminal_nodes)
-
-
-
 	def clean_enriched_data(self):
-		'''
-			6. probability checks
-				6a. must sum to 1
+		''' 6. probability checks
+			5. remove invalid state names
 		'''
 		# case 6
 		for state, probs in self.probabilities.items():
 
 			# ensure chance node P sum to 1
 			if state in self.chance_nodes:
-
-				print("STATE:%s" % state)
 				p_sum = 0
 				for p in probs:
 					p_sum+= p
 				if p_sum != 1:
 					print("case 6: die because probabilities for state %s not sum to 1" % state)
 					sys.exit(1)
+
+		# case 5
+		for parent_state, edges in self.node_adjacency_mappings.items():
+			# must have reward, probability, or edges
+
+			for child_state in edges:
+				valid = False
+				if child_state in self.probabilities.keys():
+					valid = True
+				if child_state in self.rewards.keys():
+					valid = True
+				if child_state in self.node_adjacency_mappings.keys():
+					valid = True
+
+			if not valid:
+				print("case 5: die because something that was listed as an edge doesnt meet one of three criteria")
+				sys.exit(1)
 
 
 	def parse_main(self):
@@ -203,10 +197,31 @@ class Parser:
 		# go through collected properties and enrich the information
 		self.enrich_data()
 
+		# final checks on correctness of data
 		self.clean_enriched_data()
 
+		print("FINAL props:")
 
-		# check if the data is cyclic or acyclic
+		print("chance nodes:")
+		print(self.chance_nodes)
+
+		print("decision nodes:")
+		print(self.decision_nodes)
+
+		print("terminal nodes:")
+		print(self.terminal_nodes)
+
+		print("names of all nodes in the graph:")
+		print(self.nodes_list)
+
+		print("node-adjacency-mappings:")
+		pprint(self.node_adjacency_mappings)
+
+		print("probabilities:")
+		pprint(self.probabilities)
+
+		print("rewards:")
+		pprint(self.rewards)
 
 
 
