@@ -85,28 +85,50 @@ class BI:
 
 		# if the node is a decision node, take min/max and record the decision in the policy
 		if node.name in self.decision_nodes:
-			print("reached a decision node, must take the max of my children %s " % node.name)
+
+			if not self.minimize_values:
+				print("reached a decision node, must take the max of my children %s " % node.name)
+				the_max = float('-inf')
+
+				for child in node.children:
+					score, node_name, temp = self.minimax(child, alpha, beta, child.name)
+
+					if score > the_max:
+						the_max = score
+						chosen_node = node_name		# save the name of the node
+
+					print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_max, beta))
 
 
-			the_max = float('-inf')
+				node.value = the_max
+				self.state_values[node.name] = the_max
 
-			for child in node.children:
-				score, node_name, temp = self.minimax(child, alpha, beta, child.name)
+				print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
+				self.policy[node.name] = chosen_node
 
-				if score > the_max:
-					the_max = score
-					chosen_node = node_name		# save the name of the node
+				return the_max, node.name, chosen_node
+				
+			else:
+				print("reached a decision node, must take the max of my children %s " % node.name)
+				the_min = float('inf')
 
-				print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_max, beta))
+				for child in node.children:
+					score, node_name, temp = self.minimax(child, alpha, beta, child.name)
+
+					if score < the_min:
+						the_min = score
+						chosen_node = node_name		# save the name of the node
+
+					print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_min, beta))
 
 
-			node.value = the_max
-			self.state_values[node.name] = the_max
+				node.value = the_min
+				self.state_values[node.name] = the_min
 
-			print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
-			self.policy[node.name] = chosen_node
+				print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_min))
+				self.policy[node.name] = chosen_node
 
-			return the_max, node.name, chosen_node
+				return the_min, node.name, chosen_node
 
 
 
