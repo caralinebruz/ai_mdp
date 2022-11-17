@@ -73,7 +73,7 @@ class BI:
 
 			print("Chance: node:%s, ev:%s, p:%s" % (node.name, node.value, node.p_of_reaching_node))
 
-			value = ev * p
+			value = self.rewards[node.name] * p
 			print("value: %s" % value)
 
 			return value, node.name, chosen_node
