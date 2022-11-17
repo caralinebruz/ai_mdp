@@ -87,11 +87,8 @@ class BI:
 
 			the_max = float('-inf')
 
-			ev = 0
 			for child in node.children:
 				score, node_name, temp = self.minimax(child, alpha, beta, child.name)
-
-				ev+=score
 
 				if score > the_max:
 					the_max = score
@@ -100,10 +97,8 @@ class BI:
 				print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_max, beta))
 
 
-			print("finished processing children of parent node, remaining ev:%s, the_max:%s, chosen_node:%s " % (ev, the_max, chosen_node))
-			print("achieved EV of %s for node %s" % (ev,node.name))
-			node.value = ev
-			self.rewards[node.name] = ev
+			node.value = the_max
+			self.rewards[node.name] = the_max
 
 			print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
 			return the_max, node.name, chosen_node
