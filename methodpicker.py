@@ -17,7 +17,8 @@ class Color(Enum):
 class Node:
 	def __init__(self,name):
 		self.name = name
-		self.value = None
+		self.value = float(0)
+		self.p_of_reaching_node = float(0)
 		self.children = []
 		self.parents = []
 
@@ -35,8 +36,11 @@ class Methodpicker:
 		self.created_node_objects = {}
 		self.nodes_list = props['all_states']
 		self.node_to_children_mappings = props['neighbors_directed']
+		self.chance_nodes = props['chance_nodes']
 		self.rewards = props['rewards']
+		self.probabilities = props['probabilities']
 		self.created_node_objects = {}
+		self.exact_p_mapping = {}
 		self.root = None
 
 
@@ -124,39 +128,82 @@ class Methodpicker:
 		# print("ROOT IS :%s" % root)
 		return root
 
-	def _build_tree_inner(self, node, already_created_nodes_names):
+	def _build_tree_inner(self, node, p_node, already_created_nodes_names):
 		''' Recursive function to build out all of the tree nodes
 			Returns:
 				The root node of the tree
 		'''
+		print("NODE:%s" % node.name)
+		node.p_of_reaching_node = p_node
+
 		if not node.name in self.node_to_children_mappings.keys():
 			# print("not in keys, must be a leaf??")
 			node.value = self.rewards[node.name]
-			# print("adding value to leaf: %s" % node.value)
+			node.p_of_reaching_node = p_node
+			print("1 adding value to leaf: %s and p:%s" % (node.value, node.p_of_reaching_node))
+
 
 		else:
 			children = self.node_to_children_mappings[node.name]
+
+			print("children of node:%s are %s" % (node.name, children))
 		
 			if children is None:
 				# print("reached a leaf node")
 				node.value = self.rewards[node.name]
-				# print("adding value to leaf: %s" % node.value)
+				node.p_of_reaching_node = p_node
+				print("2 >> adding value to leaf: %s and p_node %s" % (node.value, node.p_of_reaching_node))
 
 			else:
+				print("has children.")
+
+				# if node is a decision node, set p=0
+				# if node is a chance node, set 
+
 				for child in children:
-					if child not in already_created_nodes_names:
+					if True:
+					#if child not in already_created_nodes_names:
 
 						child_node = Node(child)
 						already_created_nodes_names.append(child)
+
+
+						p_node = float(1) 
+
+						# ADD P TO THE CHILD NODE
+						if node.name in self.chance_nodes:
+							# now, zip the probabilities with the children
+							print("\nnode:%s" % node.name)
+							print("\t children: %s" % children)
+							print("\t probs: %s" % self.probabilities[node.name])
+
+							list_zip = zip(children, self.probabilities[node.name])
+							zipped_list = list(list_zip)
+							print(zipped_list)
+
+							# make it a dict
+							directed = {}
+							for item in zipped_list:
+								directed[item[0]] = item[1]
+
+							print(directed)
+
+							p = directed[child]
+							print("chance node, for child %s, p=%s" % (child, p))
+							p_node = float(p)
+							# node.p_of_reaching_node = p_node
+
+
+
 						self.created_node_objects[child] = child_node
 
 						node.add_child(child_node)
-						self._build_tree_inner(child_node, already_created_nodes_names)
+						self._build_tree_inner(child_node, p_node, already_created_nodes_names)
 
-					else:
-						# child node already exists, look up the node and add it as a child
-						already_created_child_node = self.created_node_objects[child]
-						node.add_child(already_created_child_node)
+					# else:
+					# 	# child node already exists, look up the node and add it as a child
+					# 	already_created_child_node = self.created_node_objects[child]
+					# 	node.add_child(already_created_child_node)
 
 		return self.root
 
@@ -167,7 +214,7 @@ class Methodpicker:
 			Returns:
 				The complete tree
 		'''
-		tree_root = self._build_tree_inner(self.root, [])
+		tree_root = self._build_tree_inner(self.root, 1, [])
 
 
 	def dfs_visit_cycle(self, node, found_cycle):
