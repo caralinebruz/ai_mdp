@@ -23,6 +23,7 @@ class BI:
 
 		self.role = "max"
 		self.state_values = {}
+		self.policy = {}
 
 
 	def getrole(self):
@@ -49,7 +50,8 @@ class BI:
 			print("EV of node:%s" % node.name)
 			print("%s = %s * %s" % (p_e, node.value, node.p_of_reaching_node))
 
-			self.rewards[node.name] = node.value
+			#self.rewards[node.name] = node.value
+			self.state_values[node.name] = node.value
 
 			return p_e, node.name, node.name
 
@@ -61,19 +63,20 @@ class BI:
 			print("node:%s, ev:%s, p:%s" % (node.name, node.value, node.p_of_reaching_node))
 
 			# take the EV of my children
-			ev = 0
+			ev = float(0)
 			for child in node.children:
 				score, node_name, temp = self.minimax(child, alpha, beta, child.name)
 
 				ev+=score
 
 			node.value = ev
-			self.rewards[node.name] = self.rewards[node.name] + ev
+			#self.rewards[node.name] = self.rewards[node.name] + ev
+			self.state_values[node.name] = self.rewards[node.name] + ev
 			p = node.p_of_reaching_node
 
 			print("Chance: node:%s, ev:%s, p:%s" % (node.name, node.value, node.p_of_reaching_node))
 
-			value = self.rewards[node.name] * p
+			value = self.state_values[node.name] * p
 			print("value: %s" % value)
 
 			return value, node.name, chosen_node
@@ -98,9 +101,11 @@ class BI:
 
 
 			node.value = the_max
-			self.rewards[node.name] = the_max
+			self.state_values[node.name] = the_max
 
 			print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
+			self.policy[node.name] = chosen_node
+
 			return the_max, node.name, chosen_node
 
 
@@ -137,7 +142,12 @@ class BI:
 
 		print("%s(%s) chooses %s for %s" % (self.role, self.root.name, chosen_node, value))
 
-		pprint(self.rewards)
+		# pprint(self.rewards)
+
+		pprint(self.policy)
+
+
+		pprint(self.state_values)
 
 
 
