@@ -8,7 +8,7 @@ import random
 
 class MDP:
 
-	def __init__(self, gamma, tolerance, max_iterations, props):
+	def __init__(self, gamma, tolerance, max_iterations, minimize_values, props):
 		self.policy = {}
 		self.state_values = {}
 
@@ -25,6 +25,7 @@ class MDP:
 		self.tolerance = tolerance
 		self.gamma = gamma
 		self.max_iterations = max_iterations
+		self.minimize_values = minimize_values
 
 		self.neighbors_directed = props['neighbors_directed']
 		self.policy_hist = {}
@@ -121,21 +122,34 @@ class MDP:
 
 	def _argmax(self, state):
 
-		largest = float('-inf')
-		next_policy = None
+		if not self.minimize_values:
+			largest = float('-inf')
+			next_policy = None
 
-		for adjacent_state in self.neighbors_directed[state]:
-			# print("adj -> %s" % adjacent_state)
+			for adjacent_state in self.neighbors_directed[state]:
+				# print("adj -> %s" % adjacent_state)
 
-			if self.state_values[adjacent_state] > largest:
+				if self.state_values[adjacent_state] > largest:
 
-				# print("%s > %s" % (self.state_values[adjacent_state], largest))
+					# print("%s > %s" % (self.state_values[adjacent_state], largest))
 
-				largest = self.state_values[adjacent_state]
-				next_policy = adjacent_state
-			else:
-				pass
-				# print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
+					largest = self.state_values[adjacent_state]
+					next_policy = adjacent_state
+				else:
+					pass
+					# print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
+
+		else:
+			smallest = float('inf')
+			next_policy = None
+			
+			for adjacent_state in self.neighbors_directed[state]:
+
+				if self.state_values[adjacent_state] < smallest:
+					print("%s < %s" % (self.state_values[adjacent_state], smallest))
+					smallest = self.state_values[adjacent_state]
+					next_policy = adjacent_state
+
 
 		return next_policy
 

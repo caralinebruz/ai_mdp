@@ -39,9 +39,8 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 	if method == "MDP":
 		# use MDP solver
-		# this method does not use min/max flag
 
-		M = MDP(discount_factor, tolerance, max_iterations, props)
+		M = MDP(discount_factor, tolerance, max_iterations, minimize_values, props)
 
 		# set initial policy is random
 		M.make_random_policy()
@@ -61,7 +60,6 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 
 	elif method == "BACKWARDS_INDUCTION":
-		# this method uses min/max flag
 		 pass
 
 
