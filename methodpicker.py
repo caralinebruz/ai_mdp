@@ -37,6 +37,7 @@ class Methodpicker:
 		self.node_to_children_mappings = props['neighbors_directed']
 		self.rewards = props['rewards']
 		self.created_node_objects = {}
+		self.root = None
 
 
 	def create_adjacency_matrix(self):

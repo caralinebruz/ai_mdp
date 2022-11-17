@@ -45,10 +45,7 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 		# set initial policy is random
 		M.make_random_policy()
 		M.set_initial_values()
-
-		# make the equations
 		M.set_up_probabilities()
-
 		M.policy_iteration()
 
 		# for k,v in M.policy_hist.items():
@@ -66,7 +63,12 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 
 	elif method == "BACKWARDS_INDUCTION":
-		 pass
+
+		# take the tree i already made when checking for cycles
+
+		B = BI(max_iterations, minimize_values, m.root, m.created_node_objects, props)
+		B.solve()
+	
 
 
 

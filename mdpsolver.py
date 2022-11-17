@@ -4,6 +4,8 @@ import random
 
 
 class MDP:
+	''' Markov Decision Process Solver
+	'''
 
 	def __init__(self, gamma, tolerance, max_iterations, minimize_values, props):
 		self.policy = {}
