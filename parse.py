@@ -93,7 +93,7 @@ class Parser:
 			# case 1
 			if state not in self.probabilities.keys():
 				self.decision_nodes.append(state)
-				self.probabilities[state] = [1]
+				self.probabilities[state] = [float(1)]
 
 			# case 2
 			if state not in self.rewards.keys():
@@ -103,7 +103,7 @@ class Parser:
 			if len(edges) == 1:
 				# it will always transition to that edge with p=1
 				if state not in self.probabilities.keys():
-					self.probabilities[state] = [1]
+					self.probabilities[state] = [float(1)]
 
 		# case 3
 		for state in self.nodes_list:
