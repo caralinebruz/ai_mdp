@@ -51,12 +51,18 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 		M.policy_iteration()
 
-		for k,v in M.policy_hist.items():
-			print("%s : %s" % (k,v))
+		# for k,v in M.policy_hist.items():
+		# 	print("%s : %s" % (k,v))
 
+		print("\nPolicy for decision nodes:")
+		for state, policy in M.policy.items():
+			if state in M.decision_nodes:
+				print("%s -> %s" % (state, policy))
 
+		print("\nFinal values:")
 		for state, final_val in M.state_values.items():
-			print("%s -> %s" % (state, final_val))
+			print("%s=%s" % (state, final_val))
+
 
 
 	elif method == "BACKWARDS_INDUCTION":

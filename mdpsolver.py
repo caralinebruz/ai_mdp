@@ -3,46 +3,38 @@ import math
 import random
 
 
-
-
-
 class MDP:
 
 	def __init__(self, gamma, tolerance, max_iterations, minimize_values, props):
 		self.policy = {}
 		self.state_values = {}
-
-		self.given_probabilities = props['probabilities']
 		self.probabilities = {}
+		self.policy_hist = {}
 
-		self.rewards = props['rewards']
-
-		self.chance_nodes = props['chance_nodes']
-		self.decision_nodes = props['decision_nodes']
-		self.terminal_nodes = props['terminal_nodes']
-
-		self.all_states = props['all_states']
 		self.tolerance = tolerance
 		self.gamma = gamma
 		self.max_iterations = max_iterations
 		self.minimize_values = minimize_values
 
+		self.given_probabilities = props['probabilities']
+		self.rewards = props['rewards']
+		self.chance_nodes = props['chance_nodes']
+		self.decision_nodes = props['decision_nodes']
+		self.terminal_nodes = props['terminal_nodes']
+		self.all_states = props['all_states']
 		self.neighbors_directed = props['neighbors_directed']
-		self.policy_hist = {}
-
-
+		
 
 	def make_random_policy(self):
+		'''Picks from adjancent edges at random
+		
+			*Returns: A random policy
+		'''
 		for letter in self.all_states:
-
-			print(letter)
 
 			# if not letters_neighbors:
 			if letter in self.terminal_nodes:
-				# we know it's a terminal node, so leave it empty
 				self.policy[letter] = None
-
-				# also add it to the neighbors for later *****
 				self.neighbors_directed[letter] = []
 
 			elif letter in self.chance_nodes:
@@ -52,7 +44,6 @@ class MDP:
 				#otherwise pick a random neighbor to assign
 				letters_neighbors = self.neighbors_directed[letter]
 				choice = random.choice(letters_neighbors)
-				print("initially setting policy for %s -> %s" % (letter, choice))
 				self.policy[letter] = choice
 
 		# for my logging and debugging, add it to the policy hist
@@ -61,13 +52,17 @@ class MDP:
 
 
 	def set_initial_values(self):
+		# initialize values as 0, initially
 		for letter in self.all_states:
 			self.state_values[letter] = 0
 
 
 	def set_up_probabilities(self):
+		'''Based on what was given in the input file
+
+			*Returns: distributed probabilities across all edge space (v')
+		'''
 		for letter in self.neighbors_directed.keys():
-			print("letter : %s" % letter)
 
 			# TERMINALS
 			if letter in self.terminal_nodes:
@@ -78,15 +73,8 @@ class MDP:
 
 				adjacent_nodes = self.neighbors_directed[letter].copy()
 				nodes_probabilities = self.given_probabilities[letter].copy()
-
-				# for w in range(len(adjacent_nodes)):
-				# 	p = nodes_probabilities[w]
-				# 	n = adjacent_nodes[w]
-				# 	self.probabilities[letter] = [1/split] * split
-
 				self.probabilities[letter] = nodes_probabilities
 				
-
 			# DECISION NODES
 			if letter in self.decision_nodes:
 
@@ -106,47 +94,38 @@ class MDP:
 
 				# if p_success ==1 then there is nothing to distribute
 				if p_success < 1:
-					# rest of them get distributed evenly
 					split = p_fail/(num_adjacent - 1)
 
 					# assigns index 1... end with the equal split of p_fail
 					for z in range(1,num_adjacent):
-						
 						self.probabilities[letter][z] = split
-						# print("z:%s assign p_fail:%s " % (z, split))
-
-
-			print(self.probabilities[letter])
 		
 
 
 	def _argmax(self, state):
-
+		'''Performs argmin / argmax of inputs
+		
+			*Returns: The next policy
+		'''
 		if not self.minimize_values:
 			largest = float('-inf')
 			next_policy = None
 
 			for adjacent_state in self.neighbors_directed[state]:
-				# print("adj -> %s" % adjacent_state)
 
 				if self.state_values[adjacent_state] > largest:
-
 					# print("%s > %s" % (self.state_values[adjacent_state], largest))
-
 					largest = self.state_values[adjacent_state]
 					next_policy = adjacent_state
-				else:
-					pass
-					# print("not larger // %s vs %s" % (self.state_values[adjacent_state], largest))
 
 		else:
 			smallest = float('inf')
 			next_policy = None
-			
+
 			for adjacent_state in self.neighbors_directed[state]:
 
 				if self.state_values[adjacent_state] < smallest:
-					print("%s < %s" % (self.state_values[adjacent_state], smallest))
+					# print("%s < %s" % (self.state_values[adjacent_state], smallest))
 					smallest = self.state_values[adjacent_state]
 					next_policy = adjacent_state
 
@@ -155,28 +134,20 @@ class MDP:
 
 
 	def _value_iteration_inner(self, state_value_dict):
+		'''Performs a single iteration of the values
 
+			*Returns: Intermediate values
+		'''
 		pi_current_values = state_value_dict.copy()
 		pi_state_values = {}
 
 		for state, curr_val in state_value_dict.items():
 
-
-		# for state in state_names:
-
-			# print("working on state %s" % state)
-			# for all of them, they are just assigned their iterative value
 			pi_value = self.rewards[state]
-
-			print("\n")
 
 			# TERMINAL 
 			if state in self.terminal_nodes:
 				pi_state_values[state] = pi_value
-				# print("value for terminal node %s" % pi_value)
-
-				print("%s = %s" % (state,pi_value))
-
 
 			# CHANCE
 			elif state in self.chance_nodes:
@@ -190,41 +161,22 @@ class MDP:
 				if len(transition_likelihoods) != len(transition_states):
 					print("there is a huge problem here...")
 
-				# debugging
-				print("%s = %s " % (state,pi_value), end="")
 
 				for y in range(len(transition_states)):
 
 					adjacent_state_name = transition_states[y]
-
-					# this should be ok to pull from state_values 
-					# because they won't be updated until the convergence is finished
-					# transitional_value = self.state_values[transition_states[y]]
-
-					# ^ I DONT WANT THAT, you need the current iterative value
-					# transitional_value = curr_val
-					# dont want that either, thats current value of the curent equation 
 					transitional_value = pi_current_values[adjacent_state_name]
-
-
 					additive_value = self.gamma * transition_likelihoods[y] * transitional_value
 
 					pi_value+= additive_value
 					pi_state_values[state] = pi_value
 
 					# debugging
-					print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
+					# print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
 
-					# print("\ty:%s, to_state:%s, transitional_value:%s, likelihood:%s == additive_value:%s" % (y, transition_states[y], transitional_value, transition_likelihoods[y], additive_value))
-					# print("\tnew value: %s" % pi_value)
-
+			# DECISION 
 			elif state in self.decision_nodes:
-
-				# debugging
-				print("%s = %s " % (state,pi_value), end="")
-
 				to_node = self.policy[state]
-				# print("\tshould go to node %s" % to_node)
 
 				restof_nodes = self.neighbors_directed[state].copy()
 				restof_nodes.remove(to_node)
@@ -232,8 +184,6 @@ class MDP:
 				transition_states = []
 				transition_states.append(to_node)
 				transition_states.extend(restof_nodes)
-
-				# print("\t other nodes: %s" % restof_nodes)
 
 				transition_likelihoods = self.probabilities[state]
 
@@ -243,121 +193,55 @@ class MDP:
 
 				for y in range(len(transition_states)):
 
-					# transitional_value = self.state_values[transition_states[y]]
-					# ^ dont want that, i want the current iterative value
-
-					# transitional_value = curr_val
-					# dont want that either, thats current value of the curent equation 
 					adjacent_state_name = transition_states[y]
 					transitional_value = pi_current_values[adjacent_state_name]
-
 					additive_value = self.gamma * transition_likelihoods[y] * transitional_value
 
 					pi_value+= additive_value
 					pi_state_values[state] = pi_value
 
 					# debugging
-					print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
-					# print("\t+ (%s)*(%s)*(%s) " % (gamma, transition_likelihoods[y], transitional_value), end="")
-
-					# print("\ty:%s, to_state:%s, transitional_value:%s, likelihood:%s == additive_value:%s" % (y, transition_states[y], transitional_value, transition_likelihoods[y], additive_value))
-					# print("\tnew value: %s" % pi_value)
-
-			print("\n")
+					# print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
 
 
-		print(pi_state_values)
-		# return a dictionary
 		return pi_state_values
 
-		'''
-			a single iteration of the value computation
-
-		return this iteration's variable values
-		'''
 
 	def value_iteration(self):
 		# set the convergence to false
 		# compute appropriate deltas and compare for convergence
 		# upon convergence, return and set the new state_values
 		#  for the mdp class
-
-		# make temp of the values 
 		pi_values = self.state_values.copy()
-
-		# compare what is the deal with these values initially
-		print("\n")
-		for k,v in pi_values.items():
-			print("%s:%s " % (k,v), end="")
-		print("\n")
-
 		converge=False
 		x=0
 
 		while not converge:
 			x+= 1
-			print("\nIteration %s:" % x)
+			# print("\nIteration %s:" % x)
 
 			if x == self.max_iterations:
 				break
 
 			delta = 0
-
-
 			temp_pi_values = pi_values
 
-			if temp_pi_values == self.state_values:
-				print("yes, copy is first iteration")
-			else:
-				print("iterating with different pi_values")
-
-
+			# do the value iteration
 			pi_values = self._value_iteration_inner(pi_values)
 
-
-			# then we will compare the values between:
-			# prev_pi_values, iteration_pi_values
-			# get the deltas, check if we converge
-
-			print("\n")
 			for state,value in pi_values.items():
-
 				delta = max(delta,( abs(temp_pi_values[state] - value) ))
-				print(" delta %s" % delta, end="")
 
-			print("delta :%s \n" % delta)
-
+			# evaluate our stopping criteria
 			if delta < self.tolerance:
-				print("I converge after %s iterations\n" % x)
 				converge = True
-
-			# # this is an experiment and i shouldnt keep this here
-			# print("running with SINGLE ITERATION ONLY as EXPERIMENT")
-			# converge=True
-
-
-		# compare what is the deal with these values initially
-		print("\nOLD values before converge:")
-		for k,v in self.state_values.items():
-			print("%s:%s " % (k,v), end="")
-		print("\n")
 
 
 		self.state_values = pi_values.copy()
-
-		# compare what is the deal with these values initially
-		print("\nNew values after converge:")
-		for k,v in self.state_values.items():
-			print("%s:%s " % (k,v), end="")
-		print("\n")
-
-
 		return converge
 
 
-
 	def recalculate_policy(self):
-
 		# for every node's adjacency, pick the one that has the highest value
 		# use that as the new policy assignment
 		
@@ -366,9 +250,6 @@ class MDP:
 		counter = 0
 		for state, former_policy in self.policy.items():
 
-
-			print("reassigning policy for state: %s. previously -> %s" % (state, former_policy))
-
 			# get the arg max
 			to_state = self._argmax(state)
 
@@ -376,105 +257,33 @@ class MDP:
 				counter+=1
 
 			self.policy[state] = to_state
-			print("new policy ---> %s" % to_state)
 
-
-
-
-		print("new policy:")
-		for k,v in self.policy.items():
-			print("%s --> %s" % (k,v))
-			self.policy_hist[k].append(v)
-
+		# print("new policy:")
+		# for k,v in self.policy.items():
+		# 	print("%s --> %s" % (k,v))
+		# 	self.policy_hist[k].append(v)
 
 		return counter
 
 
 	def policy_iteration(self):
-
-		# M.value_iteration()
-		# policy_change = M.recalculate_policy()
-
+		''' Evaluate if we should stop policy iteration
+		'''
 		policy_changing = True
-
 		y = 0
 
 		while policy_changing:
-
 			y+=1
-			if y == 100:
-				print("BROKE OUT OF LOOP, limited y value, extend this??")
+			if y == self.max_iterations:
 				break
 
 			self.value_iteration()
 			policy_changes = self.recalculate_policy()
 
-
 			if policy_changes == 0:
 				policy_changing = False
 
-
-		print("finished after %s iterations" % y)
-
-
-'''
-# i liked this pseudocode here:
-https://medium.com/@ngao7/markov-decision-process-value-iteration-2d161d50a6ff
-
-while not converge
-	delta = 0
-	for s in S:
-		temp = v_s
-		v_s = r_s + gamma * max (P * v(s'))
-		delta = max(delta, abs(temp - v_s))
-	if delta < tolerance
-		converge = true
-
-	for s in S:
-		pi_star_s = argmax SUM(P*V(s'))
-'''
-
-
-
-# if __name__ == '__main__':
-
-# 	M = MDP()
-
-# 	# set initial policy is random
-# 	M.make_random_policy()
-# 	M.set_initial_values()
-
-
-# 	# make the equations
-# 	M.set_up_probabilities()
-
-# 	M.policy_iteration()
-
-
-
-
-
-# 	for k,v in policy_hist.items():
-# 		print("%s : %s" % (k,v))
-
-
-# 	for state, final_val in M.state_values.items():
-# 		print("%s -> %s" % (state, final_val))
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
+		# print("finished after %s iterations" % y)
 
 
 
