@@ -13,6 +13,9 @@ from methodpicker import Methodpicker
 import mdpsolver
 from mdpsolver import MDP
 
+import bisolver
+from bisolver import BI
+
 
 
 def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
