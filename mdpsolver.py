@@ -74,14 +74,17 @@ class MDP:
 
 			# CHANCE NODES
 			if letter in self.chance_nodes:
-				# split evenly among directed children
-				equal_chance_nodes = self.neighbors_directed[letter].copy()
 
-				split = len(equal_chance_nodes)
+				adjacent_nodes = self.neighbors_directed[letter].copy()
+				nodes_probabilities = self.given_probabilities[letter].copy()
 
-				# ie, make a list like 
-				#   [1/4, 1/4, 1/4, 1/4]
-				self.probabilities[letter] = [1/split] * split
+				# for w in range(len(adjacent_nodes)):
+				# 	p = nodes_probabilities[w]
+				# 	n = adjacent_nodes[w]
+				# 	self.probabilities[letter] = [1/split] * split
+
+				self.probabilities[letter] = nodes_probabilities
+				
 
 			# DECISION NODES
 			if letter in self.decision_nodes:
@@ -147,7 +150,7 @@ class MDP:
 
 		# for state in state_names:
 
-			print("working on state %s" % state)
+			# print("working on state %s" % state)
 			# for all of them, they are just assigned their iterative value
 			pi_value = self.rewards[state]
 
