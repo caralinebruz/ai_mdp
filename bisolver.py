@@ -52,8 +52,7 @@ class Tree:
 			*Returns:
 				The root node of the tree
 		'''
-		# immediately set probability of reaching node 
-		#  as object property
+		# immediately set probability of reaching node attr
 		node.p_of_reaching_node = p_node
 
 		# LEAF
@@ -77,8 +76,6 @@ class Tree:
 
 					# ADD P TO THE CHILD NODE
 					if node.name in self.chance_nodes:
-
-						# child, node.name, children
 						p_node = self._get_probability_of_node(node.name, child, children)
 
 					self.created_node_objects[child] = child_node

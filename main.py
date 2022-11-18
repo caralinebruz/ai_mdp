@@ -17,9 +17,9 @@ import bisolver
 from bisolver import BI, Tree
 
 
-
 def print_results(decision_nodes, policy, state_values):
-
+	''' Prints determined policy and state values
+	'''
 	print("\nPolicy for decision nodes:")
 	for state, policy in policy.items():
 		if state in decision_nodes:
@@ -31,19 +31,18 @@ def print_results(decision_nodes, policy, state_values):
 
 
 def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
-
-	# parse the file into necessary pieces
-	# detect cycles (if any)
-	# determine solver method (mdp vs etc....)
-
+	''' 1. Parse the input file 
+		2. Check for any cycles in the input graph
+			(this determines the solver method)
+		3. Solve using appropriate method
+	'''
 	p = Parser(lines)
 	props = p.parse()
 
 	m = Methodpicker(props)
 	method = m.pick()
 
-	print("Method we will use: %s" % method)
-
+	print("Using solver method: %s" % method)
 
 	if method == "MDP":
 
@@ -52,8 +51,6 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 		# FINALLY
 		print_results(M.decision_nodes,policy,state_values)
-
-
 
 	elif method == "BACKWARDS_INDUCTION":
 
@@ -64,7 +61,6 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 		B = BI(max_iterations, minimize_values, root, m.created_node_objects, props)
 		policy, state_values = B.solve()
 	
-
 		# FINALLY
 		print_results(B.decision_nodes,policy,state_values)
 
@@ -116,7 +112,6 @@ if __name__ == '__main__':
 		lines = args.input_file.readlines()
 		infile = args.input_file
 
-	print("discount_factor:%s, tolerance:%s" % (discount_factor, tolerance))
 
 	main(discount_factor, tolerance, max_iterations, minimize_values, lines)
 

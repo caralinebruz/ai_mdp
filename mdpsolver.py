@@ -28,7 +28,7 @@ class MDP:
 		
 
 	def make_random_policy(self):
-		'''Picks from adjancent edges at random
+		''' Picks from adjancent edges at random
 		
 			*Returns: A random policy
 		'''
@@ -60,7 +60,7 @@ class MDP:
 
 
 	def set_up_probabilities(self):
-		'''Based on what was given in the input file
+		''' Based on what was given in the input file
 
 			*Returns: distributed probabilities across all edge space (v')
 		'''
@@ -105,7 +105,7 @@ class MDP:
 
 
 	def _argmax(self, state):
-		'''Performs argmin / argmax of inputs
+		''' Performs argmin / argmax of inputs
 		
 			*Returns: The next policy
 		'''
@@ -119,7 +119,6 @@ class MDP:
 					# print("%s > %s" % (self.state_values[adjacent_state], largest))
 					largest = self.state_values[adjacent_state]
 					next_policy = adjacent_state
-
 		else:
 			smallest = float('inf')
 			next_policy = None
@@ -131,12 +130,11 @@ class MDP:
 					smallest = self.state_values[adjacent_state]
 					next_policy = adjacent_state
 
-
 		return next_policy
 
 
 	def _value_iteration_inner(self, state_value_dict):
-		'''Performs a single iteration of the values
+		''' Performs a single iteration of the values
 
 			*Returns: Intermediate values
 		'''
@@ -195,15 +193,17 @@ class MDP:
 					# debugging
 					# print("+ (%s)*(%s)*(%s) " % (self.gamma, transition_likelihoods[y], adjacent_state_name), end="")
 
-
 		return pi_state_values
 
 
 	def value_iteration(self):
-		# set the convergence to false
-		# compute appropriate deltas and compare for convergence
-		# upon convergence, return and set the new state_values
-		#  for the mdp class
+		''' Calls Value Iteration method until convergence
+			evaluates delta to desired tolerance
+			of the convergence method
+
+			*Returns:
+				State values at convergence
+		'''
 		pi_values = self.state_values.copy()
 		converge=False
 		x=0
@@ -234,15 +234,17 @@ class MDP:
 
 
 	def recalculate_policy(self):
-		# for every node's adjacency, pick the one that has the highest value
-		# use that as the new policy assignment
-		
-		# for state in self.neighbors_directed.keys():
-		# for state in self.policy.keys():
+		''' For every node's adjacency, pick the one that
+			accommodates our desired argmax/argmin
+
+			*Returns:
+				A new policy based on previous VI
+
+		'''
 		counter = 0
 		for state, former_policy in self.policy.items():
 
-			# get the arg max
+			# get the arg max (or min)
 			to_state = self._argmax(state)
 
 			if former_policy != to_state:

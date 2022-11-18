@@ -6,8 +6,7 @@ import pprint
 from pprint import pprint
 
 
-
-# classic DFS visit for detecting cycles
+# DFS visit for detecting cycles
 class Color(Enum):
 	WHITE = 1
 	GRAY = 2
@@ -22,7 +21,6 @@ class Node:
 		self.children = []
 		self.parents = []
 
-		# this is for detecting cycles later
 		self.color = Color.WHITE
 
 	def add_child(self, child):
@@ -31,6 +29,13 @@ class Node:
 
 
 class Methodpicker:
+	''' Creates a graph/tree
+		Chooses an appropriate root to build the tree
+		Checks for cycles 
+
+		*Returns:
+			Solver method in {MDP,BackwardInduction}
+	'''
 	def __init__(self, props):
 		self.method = None
 		self.created_node_objects = {}
@@ -45,12 +50,13 @@ class Methodpicker:
 
 
 	def create_adjacency_matrix(self):
-		''' Create the adjacency matrix
-			As part of the process to choose an appropriate
-				root from the input file
-				ie. ensure the tree only has one root
+		''' Create the adjacency matrix.
+			I only do this to be able to calculate the 
+			number of inbound edges for each node
+
+			*Returns:
+				adjacency matrix
 		'''
-		# cols = self.node_to_children_mappings.keys()
 		cols = self.nodes_list
 		cols.sort()
 		num = len(cols)
@@ -75,22 +81,19 @@ class Methodpicker:
 					index_num_col = index[to_node]
 					adj[index_num_row][index_num_col] +=1
 
-		# print("index:")
-		# pprint(index)
-
-		# print("adj:")
-		# for r in adj:
-		# 	print(r)
-
 		return adj, index, num, cols
 
 
 	def _sumColumn(self, m):
+		# The sum of each column indicates num of inbound edges
 		return [sum(col) for col in zip(*m)]
 
 
 	def pick_a_root(self):
 		''' Go through the adjacencies and picks the best root
+
+			*Returns:
+				Appropriate root choice
 		'''
 		adj, index, num, cols  = self.create_adjacency_matrix()
 
@@ -99,9 +102,7 @@ class Methodpicker:
 			incoming_edges[node_name] = 0
 
 		totals = self._sumColumn(adj)
-
-		# now, we start at a real high number and see what else is lower.
-		lowest = 99999999999
+		lowest = int('inf')
 		root_index = None 
 		root = None
 
@@ -130,11 +131,11 @@ class Methodpicker:
 
 	def _build_tree_inner(self, node, already_created_nodes_names):
 		''' Recursive function to build out all of the tree nodes
-			Returns:
+
+			*Returns:
 				The root node of the tree
 		'''
 		if not node.name in self.node_to_children_mappings.keys():
-			# print("not in keys, must be a leaf??")
 			node.value = self.rewards[node.name]
 			# print("adding value to leaf: %s" % node.value)
 
@@ -142,7 +143,6 @@ class Methodpicker:
 			children = self.node_to_children_mappings[node.name]
 		
 			if children is None:
-				# print("reached a leaf node")
 				node.value = self.rewards[node.name]
 				# print("adding value to leaf: %s" % node.value)
 
@@ -168,7 +168,8 @@ class Methodpicker:
 	def build_tree(self):
 		''' Wrapper function to create the root node of the tree
 			Second, calls recursive function to create the rest of the tree
-			Returns:
+
+			*Returns:
 				The complete tree
 		'''
 		tree_root = self._build_tree_inner(self.root, [])
@@ -181,10 +182,8 @@ class Methodpicker:
 			return
 
 		node.color = Color.GRAY
-		# print("node:%s" % node.name)
-		for child in node.children:
 
-			# print("\tchild: %s" % child.name)
+		for child in node.children:
 
 			if child.color == Color.GRAY:
 				found_cycle[0] = True 
@@ -198,9 +197,11 @@ class Methodpicker:
 
 
 	def check_for_cycles(self):
-		# https://algocoding.wordpress.com/2015/04/02/detecting-cycles-in-a-directed-graph-with-dfs-python/
-		# print("checking for cycles ... ")
+		''' Outer method to check for cycles in the graph
 
+			*Returns:
+				cyclic or acyclic attr
+		'''
 		found_cycle = [False]
 		for k, node in self.created_node_objects.items():
 
@@ -218,15 +219,12 @@ class Methodpicker:
 			Attempts to pick a node for a root
 			Builds a tree and DFS to check for cycles
 
-			* Returns: -> str
+			*Returns: -> str
 				MDP or BACKWARDS_INDUCTION
 		'''
-
 		item_to_be_root = self.pick_a_root()
 
 		if not item_to_be_root:
-			# print("no root found, no nodes without incoming edges")
-
 			# if root returned is none, that means there were no
 			# nodes without incoming edges
 			self.method = "MDP"
@@ -240,8 +238,6 @@ class Methodpicker:
 			self.build_tree()
 
 			if not self.check_for_cycles():
-
-				# print("no cycles detected. I can do backwards induction.")
 				self.method = "BACKWARDS_INDUCTION"
 				return self.method
 

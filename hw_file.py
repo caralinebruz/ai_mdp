@@ -2,6 +2,15 @@
 import math
 import random
 
+
+''' 
+	Unrelated scripting file
+	
+	Unrelated scripting file 
+	for last week's hw assignment of value iteration
+
+'''
+
 gamma = 0.9
 tolerance = 0.001
 # probability of failure
@@ -221,17 +230,7 @@ class MDP:
 				for y in range(len(transition_states)):
 
 					adjacent_state_name = transition_states[y]
-
-					# this should be ok to pull from state_values 
-					# because they won't be updated until the convergence is finished
-					# transitional_value = self.state_values[transition_states[y]]
-
-					# ^ I DONT WANT THAT, you need the current iterative value
-					# transitional_value = curr_val
-					# dont want that either, thats current value of the curent equation 
 					transitional_value = pi_current_values[adjacent_state_name]
-
-
 					additive_value = gamma * transition_likelihoods[y] * transitional_value
 
 					pi_value+= additive_value
@@ -273,11 +272,6 @@ class MDP:
 
 				for y in range(len(transition_states)):
 
-					# transitional_value = self.state_values[transition_states[y]]
-					# ^ dont want that, i want the current iterative value
-
-					# transitional_value = curr_val
-					# dont want that either, thats current value of the curent equation 
 					adjacent_state_name = transition_states[y]
 					transitional_value = pi_current_values[adjacent_state_name]
 
@@ -300,11 +294,6 @@ class MDP:
 		# return a dictionary
 		return pi_state_values
 
-		'''
-			a single iteration of the value computation
-
-		return this iteration's variable values
-		'''
 
 	def value_iteration(self):
 		# set the convergence to false
@@ -361,10 +350,6 @@ class MDP:
 				print("I converge after %s iterations\n" % x)
 				converge = True
 
-			# # this is an experiment and i shouldnt keep this here
-			# print("running with SINGLE ITERATION ONLY as EXPERIMENT")
-			# converge=True
-
 
 		# compare what is the deal with these values initially
 		print("\nOLD values before converge:")
@@ -387,12 +372,9 @@ class MDP:
 
 
 	def recalculate_policy(self):
-
 		# for every node's adjacency, pick the one that has the highest value
 		# use that as the new policy assignment
 		
-		# for state in self.neighbors_directed.keys():
-		# for state in self.policy.keys():
 		counter = 0
 		for state, former_policy in self.policy.items():
 
@@ -421,9 +403,6 @@ class MDP:
 
 
 	def policy_iteration(self):
-
-		# M.value_iteration()
-		# policy_change = M.recalculate_policy()
 
 		policy_changing = True
 
