@@ -14,7 +14,7 @@ import mdpsolver
 from mdpsolver import MDP
 
 import bisolver
-from bisolver import BI
+from bisolver import BI, Tree
 
 
 
@@ -54,11 +54,11 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 		print("\nPolicy for decision nodes:")
 		for state, policy in M.policy.items():
 			if state in M.decision_nodes:
-				print("%s -> %s" % (state, policy))
+				print("\t%s -> %s" % (state, policy))
 
 		print("\nFinal values:")
 		for state, final_val in M.state_values.items():
-			print("%s=%s" % (state, final_val))
+			print("\t%s = %s" % (state, final_val))
 
 
 
@@ -66,7 +66,12 @@ def main(discount_factor, tolerance, max_iterations, minimize_values, lines):
 
 		# take the tree i already made when checking for cycles
 
-		B = BI(max_iterations, minimize_values, m.root, m.created_node_objects, props)
+		# rebuild the tree, this time allow for recursion when nodes have the same names
+		t = Tree(props)
+		root = t.get_root(m.root, m.created_node_objects)
+
+
+		B = BI(max_iterations, minimize_values, root, m.created_node_objects, props)
 		B.solve()
 	
 

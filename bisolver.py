@@ -1,11 +1,126 @@
 #!/usr/bin/env python3
 
+import methodpicker
+from methodpicker import Node
+
 from pprint import pprint
+
+
+class Tree:
+	''' Rebuilds the tree
+		Allows for deeper recursion since we already checked
+		for acyclic property
+
+		*Returns:
+			Entire tree for BI Solver to use
+	'''
+	def __init__(self, props):
+		self.nodes_list = props['all_states']
+		self.node_to_children_mappings = props['neighbors_directed']
+		self.chance_nodes = props['chance_nodes']
+		self.rewards = props['rewards']
+		self.probabilities = props['probabilities']
+		self.created_node_objects = None
+		self.exact_p_mapping = {}
+		self.root = None
+
+
+	def _get_probability_of_node(self, name, child, children):
+		# now, zip the probabilities with the children
+		p_zip = zip(children, self.probabilities[name])
+		zipped_p = list(p_zip)
+
+		# make it a dict of probability mapping to edges
+		directed = {}
+		for item in zipped_p:
+			directed[item[0]] = item[1]
+
+		p = directed[child]
+		p_node = float(p)
+
+		return p_node
+
+	def _rebuild_tree_recursive(self, node, p_node, already_created_nodes_names):
+		''' Recursive function to build out all of the tree nodes
+
+			*Returns:
+				The root node of the tree
+		'''
+		# immediately set probability of reaching node 
+		#  as object property
+		node.p_of_reaching_node = p_node
+
+		# LEAF
+		if not node.name in self.node_to_children_mappings.keys():
+			node.value = self.rewards[node.name]
+			node.p_of_reaching_node = p_node
+
+		else:
+			children = self.node_to_children_mappings[node.name]
+			if children is None:
+				# print("reached a leaf node")
+				node.value = self.rewards[node.name]
+				node.p_of_reaching_node = p_node
+
+			else:
+				for child in children:
+
+					child_node = Node(child)
+					already_created_nodes_names.append(child)
+					p_node = float(1) 
+
+					# ADD P TO THE CHILD NODE
+					if node.name in self.chance_nodes:
+
+						# child, node.name, children
+						p_node = self._get_probability_of_node(node.name, child, children)
+
+
+						# # now, zip the probabilities with the children
+						# p_zip = zip(children, self.probabilities[node.name])
+						# zipped_p = list(p_zip)
+
+						# # make it a dict of probability mapping to edges
+						# directed = {}
+						# for item in zipped_p:
+						# 	directed[item[0]] = item[1]
+
+						# p = directed[child]
+						# p_node = float(p)
+
+						# print(directed)
+						# print("chance node, for child %s, p=%s" % (child, p))
+
+					self.created_node_objects[child] = child_node
+					node.add_child(child_node)
+					self._rebuild_tree_recursive(child_node, p_node, already_created_nodes_names)
+
+
+		return self.root
+
+	def rebuild_build_tree(self):
+		''' Wrapper function to create the root node of the tree
+			Second, calls recursive function to create the rest of the tree
+			Returns:
+				The built tree
+		'''
+		tree_root = self._rebuild_tree_recursive(self.root, 1, [])
+
+
+	def get_root(self, m_root, created_node_objects):
+
+		self.created_node_objects = created_node_objects
+		self.root = m_root
+		self.rebuild_build_tree()
+
+		return self.root
+
+
 
 class BI:
 	''' Deterministic Backwards Induction Solver
-	'''
 
+	'''
 	def __init__(self, max_iterations, minimize_values, root, created_node_objects, props):
 		self.max_iterations = max_iterations
 		self.minimize_values = minimize_values
