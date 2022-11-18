@@ -28,6 +28,9 @@ class Tree:
 	def _get_probability_of_node(self, name, child, children):
 		''' For chance nodes, map the exact probabilities
 			of reaching resp nodes, to their child node names
+
+			*Returns:
+				Probability of reaching this exact node
 		'''
 		p_zip = zip(children, self.probabilities[name])
 		zipped_p = list(p_zip)
@@ -88,13 +91,21 @@ class Tree:
 	def _rebuild_build_tree(self):
 		''' Wrapper function to create the root node of the tree
 			Second, calls recursive function to create the rest of the tree
-			Returns:
+
+			*Returns:
 				The built tree
 		'''
 		tree_root = self._rebuild_tree_recursive(self.root, 1, [])
 
 
 	def get_root(self, m_root, created_node_objects):
+		''' Repurposes the determined (and appropriate)
+			root node found earlier, rebuilds the tree with 
+			deeper recursion allowed for the bi solver
+
+			*Returns:
+				Root object of the new tree
+		'''
 
 		self.created_node_objects = created_node_objects
 		self.root = m_root
@@ -123,7 +134,7 @@ class BI:
 		self.all_states = props['all_states']
 		self.node_to_children_mappings = props['neighbors_directed']
 
-		self.role = "max"
+		self.role = None
 		self.state_values = {}
 		self.policy = {}
 
@@ -138,33 +149,21 @@ class BI:
 
 
 	def minimax(self, node, alpha, beta, chosen_node):
+		'''	Performs minimax solver 
+		'''
 
-		print("\nat node %s" % node.name)
-		print("p of reaching node %s" % node.p_of_reaching_node)
-
-		# check if we are at a leaf
+		# LEAF
 		if not node.children:
 
-			if node.name in self.terminal_nodes:
-				print("leaf is in here")
-
 			p_e = float(node.value) * node.p_of_reaching_node
-			print("EV of node:%s" % node.name)
-			print("%s = %s * %s" % (p_e, node.value, node.p_of_reaching_node))
-
-			#self.rewards[node.name] = node.value
 			self.state_values[node.name] = node.value
 
 			return p_e, node.name, node.name
 
-
-		# chance node need to return , what exactly?
+		# CHANCE NODE
 		if node.name in self.chance_nodes:
-			print("reached a chance node, need to pass up expected value and p of myself")
 
-			print("node:%s, ev:%s, p:%s" % (node.name, node.value, node.p_of_reaching_node))
-
-			# take the EV of my children
+			# take the EV summation of my children
 			ev = float(0)
 			for child in node.children:
 				score, node_name, temp = self.minimax(child, alpha, beta, child.name)
@@ -172,24 +171,17 @@ class BI:
 				ev+=score
 
 			node.value = ev
-			#self.rewards[node.name] = self.rewards[node.name] + ev
 			self.state_values[node.name] = self.rewards[node.name] + ev
 			p = node.p_of_reaching_node
-
-			print("Chance: node:%s, ev:%s, p:%s" % (node.name, node.value, node.p_of_reaching_node))
-
 			value = self.state_values[node.name] * p
-			print("value: %s" % value)
 
 			return value, node.name, chosen_node
 
-
-
-		# if the node is a decision node, take min/max and record the decision in the policy
+		# DECISION NODE
 		if node.name in self.decision_nodes:
 
+			# take argmin/argmax and record the decision in the policy
 			if not self.minimize_values:
-				print("reached a decision node, must take the max of my children %s " % node.name)
 				the_max = float('-inf')
 
 				for child in node.children:
@@ -197,21 +189,15 @@ class BI:
 
 					if score > the_max:
 						the_max = score
-						chosen_node = node_name		# save the name of the node
-
-					print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_max, beta))
-
+						chosen_node = node_name		# save the name of the node for policy
 
 				node.value = the_max
 				self.state_values[node.name] = the_max
-
-				print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
 				self.policy[node.name] = chosen_node
 
+				# print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_max))
 				return the_max, node.name, chosen_node
-				
 			else:
-				print("reached a decision node, must take the max of my children %s " % node.name)
 				the_min = float('inf')
 
 				for child in node.children:
@@ -219,27 +205,19 @@ class BI:
 
 					if score < the_min:
 						the_min = score
-						chosen_node = node_name		# save the name of the node
-
-					print("\tbacking up to parent (%s), new values themax= %s b= %s" % (node.name, the_min, beta))
-
+						chosen_node = node_name
 
 				node.value = the_min
 				self.state_values[node.name] = the_min
-
-				print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_min))
 				self.policy[node.name] = chosen_node
 
+				# print("%s(%s) chooses %s for %s" % (self.role, node.name, chosen_node, the_min))
 				return the_min, node.name, chosen_node
-
-
 
 
 	def set_initial_values(self):
 		'''Initially sets values to 0
-			Or, if they are a terminal state, sets to reward???
 		'''
-		
 		for state in self.all_states:
 
 			if state in self.terminal_nodes:
@@ -248,30 +226,23 @@ class BI:
 				self.state_values[state] = float(0)
 
 
-
-
-
 	def solve(self):
-		print("starting game...")
+		''' Solve the tree using minimax recursion
+			Include specialized handling depending on node type
+			ie. chance node vs terminal node etc.
 
+			*Returns:
+				The established policy and state values
+		'''
 		self.getrole()
 		self.set_initial_values()
 
-
-		for k,v in self.created_node_objects.items():
-
-			print("%s, %s" % (k,v.p_of_reaching_node))
+		# for k,v in self.created_node_objects.items():
+		# 	print("%s, %s" % (k,v.p_of_reaching_node))
 
 		value, node_name, chosen_node = self.minimax(self.root,float('-inf'),float('inf'),None)
 
-		print("%s(%s) chooses %s for %s" % (self.role, self.root.name, chosen_node, value))
-
-		# pprint(self.rewards)
-
-		pprint(self.policy)
-
-
-		pprint(self.state_values)
+		return self.policy, self.state_values
 
 
 

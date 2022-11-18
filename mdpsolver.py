@@ -153,16 +153,11 @@ class MDP:
 
 			# CHANCE
 			elif state in self.chance_nodes:
+
 				# get the neighbors of chance node
 				restof_nodes = self.neighbors_directed[state].copy()
 				transition_states = restof_nodes
-
-				# get the transition probabilities of the chance node
 				transition_likelihoods = self.probabilities[state]
-
-				if len(transition_likelihoods) != len(transition_states):
-					print("there is a huge problem here...")
-
 
 				for y in range(len(transition_states)):
 
@@ -178,20 +173,15 @@ class MDP:
 
 			# DECISION 
 			elif state in self.decision_nodes:
-				to_node = self.policy[state]
 
+				to_node = self.policy[state]
 				restof_nodes = self.neighbors_directed[state].copy()
 				restof_nodes.remove(to_node)
 
 				transition_states = []
 				transition_states.append(to_node)
 				transition_states.extend(restof_nodes)
-
 				transition_likelihoods = self.probabilities[state]
-
-				if len(transition_likelihoods) != len(transition_states):
-					print("there is a huge problem here...")
-
 
 				for y in range(len(transition_states)):
 
@@ -286,6 +276,31 @@ class MDP:
 				policy_changing = False
 
 		# print("finished after %s iterations" % y)
+
+
+	def solve(self):
+		''' Initialize & solve via policy iteration 
+
+			*Returns:
+				policy and state values
+		'''
+		self.make_random_policy()
+		self.set_initial_values()
+		self.set_up_probabilities()
+
+		# iterate until no more policy changes being made
+		self.policy_iteration()
+
+		return self.policy, self.state_values
+
+
+
+
+
+
+
+
+
 
 
 
