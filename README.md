@@ -16,6 +16,8 @@ Given an input graph file, produces a solution. Also includes a backwards induct
 
 - `-min` is an optional flag for minimizing values in the decision network (ie. argmin). defaults to MAX (ie.argmax).
 
+- input graph descriptions, see pdf
+
 
 ## Testing
 This code has been tested on `cims.nyu.edu` machine: `access`.
