@@ -26,7 +26,9 @@ class Tree:
 
 
 	def _get_probability_of_node(self, name, child, children):
-		# now, zip the probabilities with the children
+		''' For chance nodes, map the exact probabilities
+			of reaching resp nodes, to their child node names
+		'''
 		p_zip = zip(children, self.probabilities[name])
 		zipped_p = list(p_zip)
 
@@ -39,6 +41,7 @@ class Tree:
 		p_node = float(p)
 
 		return p_node
+
 
 	def _rebuild_tree_recursive(self, node, p_node, already_created_nodes_names):
 		''' Recursive function to build out all of the tree nodes
@@ -75,30 +78,14 @@ class Tree:
 						# child, node.name, children
 						p_node = self._get_probability_of_node(node.name, child, children)
 
-
-						# # now, zip the probabilities with the children
-						# p_zip = zip(children, self.probabilities[node.name])
-						# zipped_p = list(p_zip)
-
-						# # make it a dict of probability mapping to edges
-						# directed = {}
-						# for item in zipped_p:
-						# 	directed[item[0]] = item[1]
-
-						# p = directed[child]
-						# p_node = float(p)
-
-						# print(directed)
-						# print("chance node, for child %s, p=%s" % (child, p))
-
 					self.created_node_objects[child] = child_node
 					node.add_child(child_node)
 					self._rebuild_tree_recursive(child_node, p_node, already_created_nodes_names)
 
-
 		return self.root
 
-	def rebuild_build_tree(self):
+
+	def _rebuild_build_tree(self):
 		''' Wrapper function to create the root node of the tree
 			Second, calls recursive function to create the rest of the tree
 			Returns:
@@ -111,7 +98,7 @@ class Tree:
 
 		self.created_node_objects = created_node_objects
 		self.root = m_root
-		self.rebuild_build_tree()
+		self._rebuild_build_tree()
 
 		return self.root
 
