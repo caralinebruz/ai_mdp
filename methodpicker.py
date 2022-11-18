@@ -102,7 +102,7 @@ class Methodpicker:
 			incoming_edges[node_name] = 0
 
 		totals = self._sumColumn(adj)
-		lowest = int('inf')
+		lowest = float('inf')
 		root_index = None 
 		root = None
 

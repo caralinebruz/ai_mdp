@@ -18,7 +18,7 @@ from bisolver import BI, Tree
 
 
 def print_results(decision_nodes, policy, state_values):
-	''' Prints determined policy and state values
+	''' Prints computed policy and state values
 	'''
 	print("\nPolicy for decision nodes:")
 	for state, policy in policy.items():
