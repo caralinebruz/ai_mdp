@@ -1,4 +1,6 @@
-# ai_mdp
+# AI MDP
+Artificial Intelligence class lab 3
+
 A Markov Decision Process solver using policy iteration.
 
 
